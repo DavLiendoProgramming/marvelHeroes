@@ -1,12 +1,13 @@
 const express = require('express');
 const app = express();
+const cors = require('cors');
 const MARVEL_KEY_PUBLIC = '540f9d60e73b2d4db9fc08aaae0c89b4';
 //Middleware
 app.use(express.json({ extended: false }));
-
+app.use(cors());
 //Rutas
 
-app.use('/api/character', require('./routes/api/character'));
+app.use('/api', require('./routes/api/character'));
 
 // if (process.env.NODE_ENV === 'production') {
 //   //set static folder
