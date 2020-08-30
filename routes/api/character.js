@@ -2036,5 +2036,22 @@ router.get('/', async (req, res) => {
     return res.send({ error: e.message });
   }
 });
-
+//http://gateway.marvel.com/v1/public/comics/16897.jpg
+//Route @GET RANDOM CHARACTER
+// NO REQUEST PARAMETERS RETURNS RANDOM CHARACTER
+router.get('/comic', async (req, res) => {
+  //Config Variables
+  // let id = req.params.id;
+  //
+  // const url = thumbnail + '.jpg';
+  try {
+    const response = await axios.get(
+      'http://i.annihil.us/u/prod/marvel/i/mg/3/20/51e00930c667d.jpg'
+    );
+    console.log(response);
+    return res.send(response.data);
+  } catch (e) {
+    return res.send({ error: e.message });
+  }
+});
 module.exports = router;

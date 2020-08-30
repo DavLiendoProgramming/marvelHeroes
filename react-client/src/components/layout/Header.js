@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react';
 import styled from 'styled-components';
+import FavButton from '../base/FavButton';
 const Navbar = styled.nav`
   background-color: #fff;
   width: 100%;
@@ -16,18 +17,16 @@ const Input = styled.input`
   font-weight: 400;
   font-family: Roboto, sans-serif;
   border: #dbdbdb;
-  color: #a8a8a8;
+  color: #505050;
   padding: 7px 33px;
   cursor: text;
   text-align: left;
   float: left;
-  :placeholder {
+  ::placeholder {
     color: #a8a8a8;
-    outline: none;
   }
   :focus {
     outline: none;
-    color: #a8a8a8;
   }
 `;
 const NavIcon = styled.svg`
@@ -35,11 +34,6 @@ const NavIcon = styled.svg`
   float: left;
   width: 9%;
   height: 100%;
-`;
-const NavFav = styled.svg`
-  height: 100%;
-  width: 10%;
-  padding: 10px;
 `;
 const Header = () => {
   return (
@@ -88,26 +82,12 @@ const Header = () => {
             </g>
           </svg> */}
         <Input type="text" placeholder="Buscar" />
-
-        <NavFav
-          fill="white"
-          stroke="#A8A8A8"
-          strokeWidth="3px"
-          version="1.1"
-          id="Layer_1"
-          xmlns="http://www.w3.org/2000/svg"
-          x="0px"
-          y="0px"
-          width="64px"
-          height="64px"
-          viewBox="0 0 64 64"
-          enable-background="new 0 0 64 64"
-        >
+        <FavButton>
           <polygon
             points="32,47 12,62 20,38 2,24 24,24 32,1 40,24 
          62,24 44,38 52,62 "
           />
-        </NavFav>
+        </FavButton>
       </Navbar>
     </Fragment>
   );
