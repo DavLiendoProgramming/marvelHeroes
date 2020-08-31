@@ -1,30 +1,31 @@
 import React, { useContext } from 'react';
 import styled from 'styled-components';
-import FavButton from '../base/FavButton';
+import { FavButton } from '../base/FavButton';
 import SwitchButton from '../base/SwitchButton';
-import { ThemeContext } from 'styled-components';
-
+import ThemeContext from 'styled-components';
 const Navbar = styled.nav`
-  background-color: #fff;
+  background-color: ${(props) => props.theme.primaryBackground};
   width: 100%;
   height: 72px;
-  background-color: white;
-  box-shadow: 0 7px 15px -15px darkgrey;
+  box-shadow: 0 7px 7px -7px ${(props) => props.theme.shadowColor};
   margin-bottom: 15px;
   padding: 7px;
+  transition: all 0.4s ease;
 `;
 const Input = styled.input`
+  background-color: ${(props) => props.theme.secondaryBackground};
   height: 100%;
   width: 70%;
   font-size: 24px;
   font-weight: 400;
+  color: ${(props) => props.theme.primaryText};
   font-family: Roboto, sans-serif;
   border: #dbdbdb;
-  color: #505050;
   padding: 7px 33px;
   cursor: text;
   text-align: left;
   float: left;
+  border-radius: 10px;
   ::placeholder {
     color: #a8a8a8;
   }
@@ -37,16 +38,12 @@ const NavIcon = styled.svg`
   float: left;
   width: 9%;
   height: 100%;
+  padding: 7px;
+  margin-right: 5px;
 `;
 
-const Header = (props) => {
-  // const [theme, setTheme] = useState('light');
-  const themeToggler = () => {
-    theme === 'light' ? props.setTheme('dark') : props.setTheme('light');
-    console.log(theme, 'im the thing');
-  };
+const Header = ({ setTheme, themeVal }) => {
   const theme = useContext(ThemeContext);
-  console.log(theme, props.setTheme);
   return (
     <Navbar theme={theme}>
       <NavIcon
@@ -84,14 +81,9 @@ const Header = (props) => {
           </g>
         </g>
       </NavIcon>
-      <Input type="text" placeholder="Buscar" />
-      <FavButton>
-        <polygon
-          points="32,47 12,62 20,38 2,24 24,24 32,1 40,24 
-         62,24 44,38 52,62 "
-        />
-      </FavButton>
-      <SwitchButton onClick={themeToggler()} />
+      <Input type="text" placeholder="Buscar" theme={theme} />
+      <FavButton />
+      <SwitchButton setTheme={setTheme} themeVal={themeVal} />
     </Navbar>
   );
 };

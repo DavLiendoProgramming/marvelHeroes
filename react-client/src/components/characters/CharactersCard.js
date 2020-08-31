@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import img from '../img/portrait_uncanny.jpg';
-import FavButton from '../base/FavButton';
+import { FavStar } from '../base/FavButton';
 const Card = styled.div`
   text-align: justify;
   padding: 24px;
@@ -21,6 +21,10 @@ const Card = styled.div`
   }
 `;
 
+const FavIcon = styled(FavStar)`
+  transform: translate(160px, -140px);
+  padding: 15px;
+`;
 //For image replace: character.thumbnail.path
 // "thumbnail": {
 //   "path": "http://i.annihil.us/u/prod/marvel/i/mg/3/40/4bb4680432f73",
@@ -33,12 +37,12 @@ const CharactersCard = ({ character }) => {
     ''
   ) : (
     <Card>
-      <FavButton icon>
+      <FavIcon>
         <polygon
           points="32,47 12,62 20,38 2,24 24,24 32,1 40,24 
-         62,24 44,38 52,62 "
-        />
-      </FavButton>
+ 62,24 44,38 52,62 "
+        ></polygon>
+      </FavIcon>
       <h3> {character.name} </h3>
     </Card>
   );

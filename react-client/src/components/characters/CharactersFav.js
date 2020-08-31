@@ -11,30 +11,29 @@ const CharacterContainer = styled.div`
   grid-column-gap: 36px;
   grid-row-gap: 36px;
 `;
-const Characters = (props) => {
+const CharactersFav = (props) => {
   // console.log(props);
   const [data, setData] = useState();
-  useEffect(() => {
-    const fetchData = async () => {
-      const response = await axios('http://localhost:5000/api');
-      setData({ data: response.data.results });
-    };
-    fetchData();
-  }, []);
+  //   useEffect(() => {
+  //     const fetchData = async () => {
+  //       const response = await axios('http://localhost:5000/api');
+  //       setData({ data: response.data.results });
+  //     };
+  //     fetchData();
+  //   }, []);
   return data === undefined || data === {} ? (
     <Fragment>
-      <h1>Waiting for data</h1>
+      <h1>Waiting for data Im in the favorites</h1>
     </Fragment>
   ) : (
     <Fragment>
       <CharacterContainer>
-        {/*console.log(data.data)*/}
-        {data.data.map((character) => (
+        {/* {data.data.map((character) => (
           <CharactersCard character={character} key={character.id} />
-        ))}
+        ))} */}
       </CharacterContainer>
     </Fragment>
   );
 };
 
-export default Characters;
+export default CharactersFav;

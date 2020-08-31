@@ -1,5 +1,7 @@
-import React from 'react';
+import React /*, { useContext }*/ from 'react';
 import styled from 'styled-components';
+// import { ThemeContext } from 'styled-components';
+
 const Switch = styled.div`
   height: 100%;
   float: left;
@@ -66,10 +68,19 @@ const Switch = styled.div`
     background: #3e3e3e;
   }
 `;
-export const SwitchButton = () => {
+const SwitchButton = ({ setTheme, themeVal }) => {
+  // const theme = useContext(ThemeContext);
+  const themeToggler = () => {
+    themeVal === 'light' ? setTheme('dark') : setTheme('light');
+  };
   return (
     <Switch>
-      <input className="tgl tgl-light" id="1" type="checkbox" />
+      <input
+        className="tgl tgl-light"
+        id="1"
+        type="checkbox"
+        onClick={themeToggler}
+      />
       <label className="tgl-btn" htmlFor="1"></label>
     </Switch>
   );
