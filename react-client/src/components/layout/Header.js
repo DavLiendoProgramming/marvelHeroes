@@ -1,6 +1,9 @@
-import React, { Fragment } from 'react';
+import React, { useContext } from 'react';
 import styled from 'styled-components';
 import FavButton from '../base/FavButton';
+import SwitchButton from '../base/SwitchButton';
+import { ThemeContext } from 'styled-components';
+
 const Navbar = styled.nav`
   background-color: #fff;
   width: 100%;
@@ -12,7 +15,7 @@ const Navbar = styled.nav`
 `;
 const Input = styled.input`
   height: 100%;
-  width: 75%;
+  width: 70%;
   font-size: 24px;
   font-weight: 400;
   font-family: Roboto, sans-serif;
@@ -35,33 +38,40 @@ const NavIcon = styled.svg`
   width: 9%;
   height: 100%;
 `;
-const Header = () => {
+
+const Header = (props) => {
+  // const [theme, setTheme] = useState('light');
+  const themeToggler = () => {
+    theme === 'light' ? props.setTheme('dark') : props.setTheme('light');
+    console.log(theme, 'im the thing');
+  };
+  const theme = useContext(ThemeContext);
+  console.log(theme, props.setTheme);
   return (
-    <Fragment>
-      <Navbar>
-        <NavIcon
-          version="1.1"
-          id="Layer_1"
-          xmlns="http://www.w3.org/2000/svg"
-          x="0px"
-          y="0px"
-          width="1000px"
-          height="402.473px"
-          viewBox="-215.19 -86.608 1000 402.473"
-          enable-background="new -215.19 -86.608 1000 402.473"
-        >
+    <Navbar theme={theme}>
+      <NavIcon
+        version="1.1"
+        id="Layer_1"
+        xmlns="http://www.w3.org/2000/svg"
+        x="0px"
+        y="0px"
+        width="1000px"
+        height="402.473px"
+        viewBox="-215.19 -86.608 1000 402.473"
+        enable-background="new -215.19 -86.608 1000 402.473"
+      >
+        <g>
+          <rect
+            x="-215.19"
+            y="-86.608"
+            fill="#ED1D24"
+            width="1000"
+            height="402.473"
+          />
           <g>
-            <rect
-              x="-215.19"
-              y="-86.608"
-              fill="#ED1D24"
-              width="1000"
-              height="402.473"
-            />
-            <g>
-              <path
-                fill="#FFFFFF"
-                d="M631.063,7.184v-61.603H459.644l-28.191,205.803L403.557-54.418H341.74l6.925,54.915
+            <path
+              fill="#FFFFFF"
+              d="M631.063,7.184v-61.603H459.644l-28.191,205.803L403.557-54.418H341.74l6.925,54.915
 			c-7.14-14.068-32.449-54.915-88.146-54.915c-0.367-0.024-61.901,0-61.901,0l-0.237,299.974L153.324-54.418l-80.959-0.047
 			L25.753,256.349L25.777-54.42h-77.483l-27.933,174.585l-27.208-174.583h-77.508v337.906h61.036V120.618l27.764,162.866h32.449
 			l27.374-162.866v162.866H81.935l7.14-51.995h47.374l7.116,51.995l115.521,0.071h0.094v-0.071h0.072h0.072V173.799l14.162-2.063
@@ -70,26 +80,19 @@ const Header = () => {
 			V7.184H631.063z M96.265,177.905l16.758-144.461l17.4,144.461H96.265z M273.684,111.201c-4.697,2.278-9.595,3.417-14.363,3.417
 			V5.927c0.083,0,0.179-0.022,0.297-0.022c4.78-0.024,40.419,1.446,40.419,53.774C300.037,87.052,287.916,104.299,273.684,111.201
 			 M754.044,222.665v60.772H641.63V-54.465h60.526v277.13H754.044z"
-              />
-            </g>
+            />
           </g>
-        </NavIcon>
-        {/* < className="input-container">
-          <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100">
-            <g stroke-width="2" stroke="#6c6c6c" fill="none">
-              <path d="M11.29 11.71l-4-4" />
-              <circle cx="5" cy="5" r="4" />
-            </g>
-          </svg> */}
-        <Input type="text" placeholder="Buscar" />
-        <FavButton>
-          <polygon
-            points="32,47 12,62 20,38 2,24 24,24 32,1 40,24 
+        </g>
+      </NavIcon>
+      <Input type="text" placeholder="Buscar" />
+      <FavButton>
+        <polygon
+          points="32,47 12,62 20,38 2,24 24,24 32,1 40,24 
          62,24 44,38 52,62 "
-          />
-        </FavButton>
-      </Navbar>
-    </Fragment>
+        />
+      </FavButton>
+      <SwitchButton onClick={themeToggler()} />
+    </Navbar>
   );
 };
 

@@ -3,15 +3,19 @@ import styled from 'styled-components';
 import img from '../img/portrait_uncanny.jpg';
 import FavButton from '../base/FavButton';
 const Card = styled.div`
+  text-align: justify;
+  padding: 24px;
   width: 256px;
   height: 380px;
-  padding: 20px;
   border-radius: 3px;
   cursor: pointer;
   background-image: url(${img});
   & h3 {
+    position: absolute;
+    text-align: start;
+    max-width: 208px;
     font-size: 20px;
-    transform: translateY(265px);
+    transform: translate(0px, 288px);
     color: #ffffff;
     font-family: roboto, sans-serif;
   }
@@ -24,7 +28,7 @@ const Card = styled.div`
 // portrait_uncanny
 // }
 const CharactersCard = ({ character }) => {
-  console.log(character);
+  // console.log(character);
   return character === undefined ? (
     ''
   ) : (

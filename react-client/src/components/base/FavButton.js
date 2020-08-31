@@ -10,9 +10,10 @@ const FavButton = styled.svg.attrs((props) => ({
   viewBox: '0 0 64 64',
   enableBackground: 'new 0 0 64 64',
 }))`
+  float: left;
   height: ${(props) => (props.icon ? '25px' : '90%')};
   width: ${(props) => (props.icon ? '25px' : '10%')};
   padding: ${(props) => (props.icon ? '' : '10px')};
-  transform: translateX(${(props) => (props.icon ? '191px' : '')}); ;
+  transform: translateX(${(props) => (props.icon ? '185px' : '')}); ;
 `;
 export default FavButton;

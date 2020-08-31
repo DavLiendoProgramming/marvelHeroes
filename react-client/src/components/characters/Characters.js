@@ -27,7 +27,7 @@ const Characters = (props) => {
   ) : (
     <Fragment>
       <CharacterContainer>
-        {console.log(data.data)}
+        {/*console.log(data.data)*/}
         {data.data.map((character) => (
           <CharactersCard character={character} key={character.id} />
         ))}
