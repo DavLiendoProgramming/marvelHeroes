@@ -9,13 +9,16 @@ const publicKey = '540f9d60e73b2d4db9fc08aaae0c89b4';
 require('dotenv').config();
 
 //Random Character offset
-
 const randomOffset = require('../../middleware/randomChar');
 
-//Route @GET CHARACTER
+//Comic Id getter
+const comicId = require('../../middleware/getComicId');
+
+//Route @GET CHARACTER By Name FOR THE SEARCH ROUTE
 //Request Parameters: name, namestartswith,modifiedsince,comics,series,events,stories,orderby
 router.get('/character', async (req, res) => {
   //Config Variables
+
   let ts = new Date().getTime();
   let str = ts.toString() + process.env.MARVEL_KEY_PRIVATE + publicKey;
   let hash = md5(str);
@@ -29,6 +32,33 @@ router.get('/character', async (req, res) => {
   try {
     const response = await axios.get(url);
     console.log(response);
+    return res.send(response.data);
+  } catch (e) {
+    return res.send({ error: e.message });
+  }
+});
+
+//Route @GET CHARACTER By Id FOR THE FAVORITES ROUTE
+//Request Parameters: name, namestartswith,modifiedsince,comics,series,events,stories,orderby
+router.get('/characterid/:id', async (req, res) => {
+  //Config Variables
+  let id = req.params.id;
+  if (req.params.id === '') {
+    id = req.body.id;
+  }
+
+  let ts = new Date().getTime();
+  let str = ts.toString() + process.env.MARVEL_KEY_PRIVATE + publicKey;
+  let hash = md5(str);
+
+  //Request Variables
+  let char = req.body.char;
+  let limit = req.body.limit;
+  let offset = req.body.offset;
+  let skip = req.body.skip;
+  const url = `https://gateway.marvel.com:443/v1/public/characters?id=${id}&ts=${ts}&apikey=${publicKey}&hash=${hash}`;
+  try {
+    const response = await axios.get(url);
     return res.send(response.data);
   } catch (e) {
     return res.send({ error: e.message });
@@ -2027,31 +2057,2066 @@ router.get('/', async (req, res) => {
     ],
   };
   //Request Variables
-  const url = `https://gateway.marvel.com:443/v1/public/characters?modifiedSince=${date}&offset=${offset}&ts=${ts}&apikey=${publicKey}&hash=${hash}`;
+  const url = `https://gateway.marvel.com:443/v1/public/characters?modifiedSince=${date}&offset=${offset}&ts=${ts}&apikey=${publicKey}&hash=${hash}&limit=8`;
   try {
     // const response = await axios.get(url);
-    // console.log(response);
-    return res.send(data);
+    // return res.send(response.data.data.results);
+    return res.send(data.results);
   } catch (e) {
     return res.send({ error: e.message });
   }
 });
-//http://gateway.marvel.com/v1/public/comics/16897.jpg
-//Route @GET RANDOM CHARACTER
-// NO REQUEST PARAMETERS RETURNS RANDOM CHARACTER
+
+//Tested for:  'http://gateway.marvel.com/v1/public/comics/17752'
+//http://gateway.marvel.com/v1/public/comics/16897.jpg Example of comic
+//Route @GET FOR GETTING COMIC INFORMATION USING COMIC'S ID
 router.get('/comic', async (req, res) => {
   //Config Variables
-  // let id = req.params.id;
-  //
-  // const url = thumbnail + '.jpg';
+  // let id = req.body.id;
+  //data.results.title data.results.description data.results.thumnbnail.path + string to select the type of img
+  let ts = new Date().getTime();
+  let str = ts.toString() + process.env.MARVEL_KEY_PRIVATE + publicKey;
+  let hash = md5(str);
+  let date = new Date('1940-1-1');
+  let id = comicId('http://gateway.marvel.com/v1/public/comics/17752');
+  let url = `https://gateway.marvel.com:443/v1/public/comics?&id=${id}&ts=${ts}&apikey=${publicKey}&hash=${hash}`;
+
   try {
-    const response = await axios.get(
-      'http://i.annihil.us/u/prod/marvel/i/mg/3/20/51e00930c667d.jpg'
-    );
-    console.log(response);
-    return res.send(response.data);
+    const response = await axios.get(url);
+    return res.send(response.data.data);
   } catch (e) {
     return res.send({ error: e.message });
   }
 });
+
+//Tested for:  'https://gateway.marvel.com:443/v1/public/characters/1010351/comics?orderBy=onsaleDate&limit=20&apikey=540f9d60e73b2d4db9fc08aaae0c89b4'
+//http://gateway.marvel.com/v1/public/comics/16897.jpg
+//Route @GET FOR GETTING LIST OF COMICS OF A CHARACTER
+router.get('/character/comics', async (req, res) => {
+  //Config Variables
+  console.log(req.body, 'im the body dude');
+  let id = req.body.id;
+  let ts = new Date().getTime();
+  let str = ts.toString() + process.env.MARVEL_KEY_PRIVATE + publicKey;
+  let hash = md5(str);
+  let limit = '';
+  let url = `https://gateway.marvel.com:443/v1/public/characters/${id}/comics?orderBy=onsaleDate&limit=10&ts=${ts}&apikey=${publicKey}&hash=${hash}`;
+  let dumData = [
+    {
+      id: 19703,
+      digitalId: 47468,
+      title: 'Marvel Team-Up (1972) #8',
+      issueNumber: 8,
+      variantDescription: '',
+      description:
+        'Spider-Man and superheroine the CAT take on an all-new man-hating menace: the murderous MAN-KILLER!',
+      modified: '2019-07-30T11:08:20-0400',
+      isbn: '',
+      upc: '',
+      diamondCode: '',
+      ean: '',
+      issn: '',
+      format: 'Comic',
+      pageCount: 0,
+      textObjects: [
+        {
+          type: 'issue_solicit_text',
+          language: 'en-us',
+          text:
+            'Spider-Man and superheroine the CAT take on an all-new man-hating menace: the murderous MAN-KILLER!',
+        },
+      ],
+      resourceURI: 'http://gateway.marvel.com/v1/public/comics/19703',
+      urls: [
+        {
+          type: 'detail',
+          url:
+            'http://marvel.com/comics/issue/19703/marvel_team-up_1972_8?utm_campaign=apiRef&utm_source=540f9d60e73b2d4db9fc08aaae0c89b4',
+        },
+        {
+          type: 'reader',
+          url:
+            'http://marvel.com/digitalcomics/view.htm?iid=47468&utm_campaign=apiRef&utm_source=540f9d60e73b2d4db9fc08aaae0c89b4',
+        },
+      ],
+      series: {
+        resourceURI: 'http://gateway.marvel.com/v1/public/series/3716',
+        name: 'Marvel Team-Up (1972 - 1985)',
+      },
+      variants: [],
+      collections: [],
+      collectedIssues: [],
+      dates: [
+        {
+          type: 'onsaleDate',
+          date: '1973-04-01T00:00:00-0500',
+        },
+        {
+          type: 'focDate',
+          date: '-0001-11-30T00:00:00-0500',
+        },
+        {
+          type: 'unlimitedDate',
+          date: '2019-08-05T00:00:00-0400',
+        },
+      ],
+      prices: [
+        {
+          type: 'printPrice',
+          price: 0,
+        },
+      ],
+      thumbnail: {
+        path: 'http://i.annihil.us/u/prod/marvel/i/mg/c/20/5d1f6b2c41a9e',
+        extension: 'jpg',
+      },
+      images: [
+        {
+          path: 'http://i.annihil.us/u/prod/marvel/i/mg/c/20/5d1f6b2c41a9e',
+          extension: 'jpg',
+        },
+      ],
+      creators: {
+        available: 4,
+        collectionURI:
+          'http://gateway.marvel.com/v1/public/comics/19703/creators',
+        items: [
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/1167',
+            name: 'Ross Andru',
+            role: 'penciler',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/954',
+            name: 'Gerry Conway',
+            role: 'writer',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/962',
+            name: 'Stan Goldberg',
+            role: 'colorist',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/389',
+            name: 'Jim Mooney',
+            role: 'inker',
+          },
+        ],
+        returned: 4,
+      },
+      characters: {
+        available: 2,
+        collectionURI:
+          'http://gateway.marvel.com/v1/public/comics/19703/characters',
+        items: [
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1010351',
+            name: 'Hellcat (Patsy Walker)',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1009610',
+            name: 'Spider-Man',
+          },
+        ],
+        returned: 2,
+      },
+      stories: {
+        available: 3,
+        collectionURI:
+          'http://gateway.marvel.com/v1/public/comics/19703/stories',
+        items: [
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/stories/41775',
+            name: 'Cover #41775',
+            type: 'cover',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/stories/41776',
+            name: 'The Man-Killer',
+            type: 'interiorStory',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/stories/151538',
+            name: 'cover from Marvel Team-Up (1972) #8',
+            type: 'cover',
+          },
+        ],
+        returned: 3,
+      },
+      events: {
+        available: 0,
+        collectionURI:
+          'http://gateway.marvel.com/v1/public/comics/19703/events',
+        items: [],
+        returned: 0,
+      },
+    },
+    {
+      id: 7002,
+      digitalId: 5130,
+      title: 'Avengers (1963) #144',
+      issueNumber: 144,
+      variantDescription: '',
+      description: null,
+      modified: '2017-08-16T15:41:42-0400',
+      isbn: '',
+      upc: '',
+      diamondCode: '',
+      ean: '',
+      issn: '',
+      format: 'Comic',
+      pageCount: 36,
+      textObjects: [],
+      resourceURI: 'http://gateway.marvel.com/v1/public/comics/7002',
+      urls: [
+        {
+          type: 'detail',
+          url:
+            'http://marvel.com/comics/issue/7002/avengers_1963_144?utm_campaign=apiRef&utm_source=540f9d60e73b2d4db9fc08aaae0c89b4',
+        },
+        {
+          type: 'purchase',
+          url:
+            'http://comicstore.marvel.com/Avengers-144/digital-comic/5130?utm_campaign=apiRef&utm_source=540f9d60e73b2d4db9fc08aaae0c89b4',
+        },
+        {
+          type: 'reader',
+          url:
+            'http://marvel.com/digitalcomics/view.htm?iid=5130&utm_campaign=apiRef&utm_source=540f9d60e73b2d4db9fc08aaae0c89b4',
+        },
+        {
+          type: 'inAppLink',
+          url:
+            'https://applink.marvel.com/issue/5130?utm_campaign=apiRef&utm_source=540f9d60e73b2d4db9fc08aaae0c89b4',
+        },
+      ],
+      series: {
+        resourceURI: 'http://gateway.marvel.com/v1/public/series/1991',
+        name: 'Avengers (1963 - 1996)',
+      },
+      variants: [],
+      collections: [
+        {
+          resourceURI: 'http://gateway.marvel.com/v1/public/comics/2817',
+          name: 'Avengers: The Serpent Crown (Trade Paperback)',
+        },
+      ],
+      collectedIssues: [],
+      dates: [
+        {
+          type: 'onsaleDate',
+          date: '1976-02-01T00:00:00-0500',
+        },
+        {
+          type: 'focDate',
+          date: '-0001-11-30T00:00:00-0500',
+        },
+        {
+          type: 'unlimitedDate',
+          date: '2008-09-17T00:00:00-0400',
+        },
+        {
+          type: 'digitalPurchaseDate',
+          date: '2013-12-31T00:00:00-0500',
+        },
+      ],
+      prices: [
+        {
+          type: 'printPrice',
+          price: 0,
+        },
+        {
+          type: 'digitalPurchasePrice',
+          price: 1.99,
+        },
+      ],
+      thumbnail: {
+        path: 'http://i.annihil.us/u/prod/marvel/i/mg/1/60/4bb6dea34aa2b',
+        extension: 'jpg',
+      },
+      images: [
+        {
+          path: 'http://i.annihil.us/u/prod/marvel/i/mg/1/60/4bb6dea34aa2b',
+          extension: 'jpg',
+        },
+      ],
+      creators: {
+        available: 2,
+        collectionURI:
+          'http://gateway.marvel.com/v1/public/comics/7002/creators',
+        items: [
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/103',
+            name: 'George Perez',
+            role: 'penciler',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/6259',
+            name: 'Denise Wohl',
+            role: 'letterer',
+          },
+        ],
+        returned: 2,
+      },
+      characters: {
+        available: 6,
+        collectionURI:
+          'http://gateway.marvel.com/v1/public/comics/7002/characters',
+        items: [
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1009165',
+            name: 'Avengers',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1009175',
+            name: 'Beast',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1009220',
+            name: 'Captain America',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1010351',
+            name: 'Hellcat (Patsy Walker)',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1009368',
+            name: 'Iron Man',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1009697',
+            name: 'Vision',
+          },
+        ],
+        returned: 6,
+      },
+      stories: {
+        available: 2,
+        collectionURI:
+          'http://gateway.marvel.com/v1/public/comics/7002/stories',
+        items: [
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/stories/14541',
+            name: 'AVENGERS (1963) #144',
+            type: 'cover',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/stories/14542',
+            name: 'Claws!',
+            type: 'interiorStory',
+          },
+        ],
+        returned: 2,
+      },
+      events: {
+        available: 0,
+        collectionURI: 'http://gateway.marvel.com/v1/public/comics/7002/events',
+        items: [],
+        returned: 0,
+      },
+    },
+    {
+      id: 7006,
+      digitalId: 5132,
+      title: 'Avengers (1963) #148',
+      issueNumber: 148,
+      variantDescription: '',
+      description: null,
+      modified: '-0001-11-30T00:00:00-0500',
+      isbn: '',
+      upc: '',
+      diamondCode: '',
+      ean: '',
+      issn: '',
+      format: 'Comic',
+      pageCount: 36,
+      textObjects: [],
+      resourceURI: 'http://gateway.marvel.com/v1/public/comics/7006',
+      urls: [
+        {
+          type: 'detail',
+          url:
+            'http://marvel.com/comics/issue/7006/avengers_1963_148?utm_campaign=apiRef&utm_source=540f9d60e73b2d4db9fc08aaae0c89b4',
+        },
+        {
+          type: 'purchase',
+          url:
+            'http://comicstore.marvel.com/Avengers-148/digital-comic/5132?utm_campaign=apiRef&utm_source=540f9d60e73b2d4db9fc08aaae0c89b4',
+        },
+        {
+          type: 'reader',
+          url:
+            'http://marvel.com/digitalcomics/view.htm?iid=5132&utm_campaign=apiRef&utm_source=540f9d60e73b2d4db9fc08aaae0c89b4',
+        },
+        {
+          type: 'inAppLink',
+          url:
+            'https://applink.marvel.com/issue/5132?utm_campaign=apiRef&utm_source=540f9d60e73b2d4db9fc08aaae0c89b4',
+        },
+      ],
+      series: {
+        resourceURI: 'http://gateway.marvel.com/v1/public/series/1991',
+        name: 'Avengers (1963 - 1996)',
+      },
+      variants: [],
+      collections: [
+        {
+          resourceURI: 'http://gateway.marvel.com/v1/public/comics/2817',
+          name: 'Avengers: The Serpent Crown (Trade Paperback)',
+        },
+      ],
+      collectedIssues: [],
+      dates: [
+        {
+          type: 'onsaleDate',
+          date: '1976-06-01T00:00:00-0400',
+        },
+        {
+          type: 'focDate',
+          date: '-0001-11-30T00:00:00-0500',
+        },
+        {
+          type: 'unlimitedDate',
+          date: '2008-09-17T00:00:00-0400',
+        },
+        {
+          type: 'digitalPurchaseDate',
+          date: '2013-12-31T00:00:00-0500',
+        },
+      ],
+      prices: [
+        {
+          type: 'printPrice',
+          price: 0,
+        },
+        {
+          type: 'digitalPurchasePrice',
+          price: 1.99,
+        },
+      ],
+      thumbnail: {
+        path: 'http://i.annihil.us/u/prod/marvel/i/mg/8/80/4bb6de9dedade',
+        extension: 'jpg',
+      },
+      images: [
+        {
+          path: 'http://i.annihil.us/u/prod/marvel/i/mg/8/80/4bb6de9dedade',
+          extension: 'jpg',
+        },
+      ],
+      creators: {
+        available: 4,
+        collectionURI:
+          'http://gateway.marvel.com/v1/public/comics/7006/creators',
+        items: [
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/104',
+            name: 'Steve Englehart',
+            role: 'writer',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/1314',
+            name: 'Sam Grainger',
+            role: 'inker',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/791',
+            name: 'Tom Orzechowski',
+            role: 'letterer',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/103',
+            name: 'George Perez',
+            role: 'penciler',
+          },
+        ],
+        returned: 4,
+      },
+      characters: {
+        available: 9,
+        collectionURI:
+          'http://gateway.marvel.com/v1/public/comics/7006/characters',
+        items: [
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1009165',
+            name: 'Avengers',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1009175',
+            name: 'Beast',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1009220',
+            name: 'Captain America',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1010351',
+            name: 'Hellcat (Patsy Walker)',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1009368',
+            name: 'Iron Man',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1009562',
+            name: 'Scarlet Witch',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1014905',
+            name: 'Squadron Sinister',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1009664',
+            name: 'Thor',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1009697',
+            name: 'Vision',
+          },
+        ],
+        returned: 9,
+      },
+      stories: {
+        available: 3,
+        collectionURI:
+          'http://gateway.marvel.com/v1/public/comics/7006/stories',
+        items: [
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/stories/14549',
+            name: 'AVENGERS (1963) #148',
+            type: 'cover',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/stories/14550',
+            name: '20,000 Leagues under Justice!',
+            type: 'interiorStory',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/stories/187383',
+            name: 'story from Avengers (1963) #148',
+            type: 'interiorStory',
+          },
+        ],
+        returned: 3,
+      },
+      events: {
+        available: 0,
+        collectionURI: 'http://gateway.marvel.com/v1/public/comics/7006/events',
+        items: [],
+        returned: 0,
+      },
+    },
+    {
+      id: 7007,
+      digitalId: 5133,
+      title: 'Avengers (1963) #149',
+      issueNumber: 149,
+      variantDescription: '',
+      description: null,
+      modified: '2014-05-07T11:57:34-0400',
+      isbn: '',
+      upc: '',
+      diamondCode: '',
+      ean: '',
+      issn: '',
+      format: 'Comic',
+      pageCount: 36,
+      textObjects: [],
+      resourceURI: 'http://gateway.marvel.com/v1/public/comics/7007',
+      urls: [
+        {
+          type: 'detail',
+          url:
+            'http://marvel.com/comics/issue/7007/avengers_1963_149?utm_campaign=apiRef&utm_source=540f9d60e73b2d4db9fc08aaae0c89b4',
+        },
+        {
+          type: 'purchase',
+          url:
+            'http://comicstore.marvel.com/Avengers-149/digital-comic/5133?utm_campaign=apiRef&utm_source=540f9d60e73b2d4db9fc08aaae0c89b4',
+        },
+        {
+          type: 'reader',
+          url:
+            'http://marvel.com/digitalcomics/view.htm?iid=5133&utm_campaign=apiRef&utm_source=540f9d60e73b2d4db9fc08aaae0c89b4',
+        },
+        {
+          type: 'inAppLink',
+          url:
+            'https://applink.marvel.com/issue/5133?utm_campaign=apiRef&utm_source=540f9d60e73b2d4db9fc08aaae0c89b4',
+        },
+      ],
+      series: {
+        resourceURI: 'http://gateway.marvel.com/v1/public/series/1991',
+        name: 'Avengers (1963 - 1996)',
+      },
+      variants: [],
+      collections: [
+        {
+          resourceURI: 'http://gateway.marvel.com/v1/public/comics/2817',
+          name: 'Avengers: The Serpent Crown (Trade Paperback)',
+        },
+      ],
+      collectedIssues: [],
+      dates: [
+        {
+          type: 'onsaleDate',
+          date: '1976-07-01T00:00:00-0400',
+        },
+        {
+          type: 'focDate',
+          date: '-0001-11-30T00:00:00-0500',
+        },
+        {
+          type: 'unlimitedDate',
+          date: '2008-09-17T00:00:00-0400',
+        },
+        {
+          type: 'digitalPurchaseDate',
+          date: '2013-12-31T00:00:00-0500',
+        },
+      ],
+      prices: [
+        {
+          type: 'printPrice',
+          price: 0,
+        },
+        {
+          type: 'digitalPurchasePrice',
+          price: 1.99,
+        },
+      ],
+      thumbnail: {
+        path: 'http://i.annihil.us/u/prod/marvel/i/mg/c/80/587fbe30e5ec1',
+        extension: 'jpg',
+      },
+      images: [
+        {
+          path: 'http://i.annihil.us/u/prod/marvel/i/mg/c/80/587fbe30e5ec1',
+          extension: 'jpg',
+        },
+        {
+          path: 'http://i.annihil.us/u/prod/marvel/i/mg/7/30/4bb6de9885247',
+          extension: 'jpg',
+        },
+      ],
+      creators: {
+        available: 4,
+        collectionURI:
+          'http://gateway.marvel.com/v1/public/comics/7007/creators',
+        items: [
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/104',
+            name: 'Steve Englehart',
+            role: 'writer',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/1314',
+            name: 'Sam Grainger',
+            role: 'inker',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/791',
+            name: 'Tom Orzechowski',
+            role: 'letterer',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/103',
+            name: 'George Perez',
+            role: 'penciler',
+          },
+        ],
+        returned: 4,
+      },
+      characters: {
+        available: 8,
+        collectionURI:
+          'http://gateway.marvel.com/v1/public/comics/7007/characters',
+        items: [
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1009165',
+            name: 'Avengers',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1009175',
+            name: 'Beast',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1009220',
+            name: 'Captain America',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1010351',
+            name: 'Hellcat (Patsy Walker)',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1009368',
+            name: 'Iron Man',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1009562',
+            name: 'Scarlet Witch',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1009664',
+            name: 'Thor',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1009697',
+            name: 'Vision',
+          },
+        ],
+        returned: 8,
+      },
+      stories: {
+        available: 3,
+        collectionURI:
+          'http://gateway.marvel.com/v1/public/comics/7007/stories',
+        items: [
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/stories/14551',
+            name: 'AVENGERS (1963) #149',
+            type: 'cover',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/stories/14552',
+            name: 'The Gods and the Gang!',
+            type: 'interiorStory',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/stories/187384',
+            name: 'story from Avengers (1963) #149',
+            type: 'interiorStory',
+          },
+        ],
+        returned: 3,
+      },
+      events: {
+        available: 0,
+        collectionURI: 'http://gateway.marvel.com/v1/public/comics/7007/events',
+        items: [],
+        returned: 0,
+      },
+    },
+    {
+      id: 7009,
+      digitalId: 29119,
+      title: 'Avengers (1963) #150',
+      issueNumber: 150,
+      variantDescription: '',
+      description: null,
+      modified: '2015-10-27T10:35:14-0400',
+      isbn: '',
+      upc: '',
+      diamondCode: '',
+      ean: '',
+      issn: '',
+      format: 'Comic',
+      pageCount: 36,
+      textObjects: [],
+      resourceURI: 'http://gateway.marvel.com/v1/public/comics/7009',
+      urls: [
+        {
+          type: 'detail',
+          url:
+            'http://marvel.com/comics/issue/7009/avengers_1963_150?utm_campaign=apiRef&utm_source=540f9d60e73b2d4db9fc08aaae0c89b4',
+        },
+        {
+          type: 'purchase',
+          url:
+            'http://comicstore.marvel.com/Avengers-150/digital-comic/29119?utm_campaign=apiRef&utm_source=540f9d60e73b2d4db9fc08aaae0c89b4',
+        },
+        {
+          type: 'reader',
+          url:
+            'http://marvel.com/digitalcomics/view.htm?iid=29119&utm_campaign=apiRef&utm_source=540f9d60e73b2d4db9fc08aaae0c89b4',
+        },
+        {
+          type: 'inAppLink',
+          url:
+            'https://applink.marvel.com/issue/29119?utm_campaign=apiRef&utm_source=540f9d60e73b2d4db9fc08aaae0c89b4',
+        },
+      ],
+      series: {
+        resourceURI: 'http://gateway.marvel.com/v1/public/series/1991',
+        name: 'Avengers (1963 - 1996)',
+      },
+      variants: [],
+      collections: [],
+      collectedIssues: [],
+      dates: [
+        {
+          type: 'onsaleDate',
+          date: '1976-08-01T00:00:00-0400',
+        },
+        {
+          type: 'focDate',
+          date: '-0001-11-30T00:00:00-0500',
+        },
+        {
+          type: 'unlimitedDate',
+          date: '2013-04-29T00:00:00-0400',
+        },
+        {
+          type: 'digitalPurchaseDate',
+          date: '2014-09-16T00:00:00-0400',
+        },
+      ],
+      prices: [
+        {
+          type: 'printPrice',
+          price: 0,
+        },
+        {
+          type: 'digitalPurchasePrice',
+          price: 1.99,
+        },
+      ],
+      thumbnail: {
+        path: 'http://i.annihil.us/u/prod/marvel/i/mg/9/00/587fc6ab140c1',
+        extension: 'jpg',
+      },
+      images: [
+        {
+          path: 'http://i.annihil.us/u/prod/marvel/i/mg/9/00/587fc6ab140c1',
+          extension: 'jpg',
+        },
+        {
+          path: 'http://i.annihil.us/u/prod/marvel/i/mg/6/80/4c3770d48cd08',
+          extension: 'jpg',
+        },
+      ],
+      creators: {
+        available: 8,
+        collectionURI:
+          'http://gateway.marvel.com/v1/public/comics/7009/creators',
+        items: [
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/263',
+            name: 'Dick Ayers',
+            role: 'inker',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/1529',
+            name: 'John Tartaglione',
+            role: 'inker',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/104',
+            name: 'Steve Englehart',
+            role: 'writer',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/30',
+            name: 'Stan Lee',
+            role: 'writer',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/196',
+            name: 'Jack Kirby',
+            role: 'penciler',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/103',
+            name: 'George Perez',
+            role: 'penciler',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/13093',
+            name: 'Art Simek',
+            role: 'letterer',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/6259',
+            name: 'Denise Wohl',
+            role: 'letterer',
+          },
+        ],
+        returned: 8,
+      },
+      characters: {
+        available: 9,
+        collectionURI:
+          'http://gateway.marvel.com/v1/public/comics/7009/characters',
+        items: [
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1009165',
+            name: 'Avengers',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1009175',
+            name: 'Beast',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1009220',
+            name: 'Captain America',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1010351',
+            name: 'Hellcat (Patsy Walker)',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1009368',
+            name: 'Iron Man',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1009451',
+            name: 'Moondragon',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1009562',
+            name: 'Scarlet Witch',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1009664',
+            name: 'Thor',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1009697',
+            name: 'Vision',
+          },
+        ],
+        returned: 9,
+      },
+      stories: {
+        available: 3,
+        collectionURI:
+          'http://gateway.marvel.com/v1/public/comics/7009/stories',
+        items: [
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/stories/14555',
+            name: 'AVENGERS (1963) #150',
+            type: 'cover',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/stories/14556',
+            name: 'Avengers Assemble!',
+            type: 'interiorStory',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/stories/187385',
+            name: 'story from Avengers (1963) #150',
+            type: 'interiorStory',
+          },
+        ],
+        returned: 3,
+      },
+      events: {
+        available: 0,
+        collectionURI: 'http://gateway.marvel.com/v1/public/comics/7009/events',
+        items: [],
+        returned: 0,
+      },
+    },
+    {
+      id: 7010,
+      digitalId: 21894,
+      title: 'Avengers (1963) #151',
+      issueNumber: 151,
+      variantDescription: '',
+      description: null,
+      modified: '2010-10-29T19:43:29-0400',
+      isbn: '',
+      upc: '',
+      diamondCode: '',
+      ean: '',
+      issn: '',
+      format: 'Comic',
+      pageCount: 36,
+      textObjects: [],
+      resourceURI: 'http://gateway.marvel.com/v1/public/comics/7010',
+      urls: [
+        {
+          type: 'detail',
+          url:
+            'http://marvel.com/comics/issue/7010/avengers_1963_151?utm_campaign=apiRef&utm_source=540f9d60e73b2d4db9fc08aaae0c89b4',
+        },
+        {
+          type: 'purchase',
+          url:
+            'http://comicstore.marvel.com/Avengers-151/digital-comic/21894?utm_campaign=apiRef&utm_source=540f9d60e73b2d4db9fc08aaae0c89b4',
+        },
+        {
+          type: 'reader',
+          url:
+            'http://marvel.com/digitalcomics/view.htm?iid=21894&utm_campaign=apiRef&utm_source=540f9d60e73b2d4db9fc08aaae0c89b4',
+        },
+        {
+          type: 'inAppLink',
+          url:
+            'https://applink.marvel.com/issue/21894?utm_campaign=apiRef&utm_source=540f9d60e73b2d4db9fc08aaae0c89b4',
+        },
+      ],
+      series: {
+        resourceURI: 'http://gateway.marvel.com/v1/public/series/1991',
+        name: 'Avengers (1963 - 1996)',
+      },
+      variants: [],
+      collections: [],
+      collectedIssues: [],
+      dates: [
+        {
+          type: 'onsaleDate',
+          date: '1976-09-01T00:00:00-0400',
+        },
+        {
+          type: 'focDate',
+          date: '-0001-11-30T00:00:00-0500',
+        },
+        {
+          type: 'unlimitedDate',
+          date: '2012-07-18T00:00:00-0400',
+        },
+        {
+          type: 'digitalPurchaseDate',
+          date: '2014-09-16T00:00:00-0400',
+        },
+      ],
+      prices: [
+        {
+          type: 'printPrice',
+          price: 0,
+        },
+        {
+          type: 'digitalPurchasePrice',
+          price: 1.99,
+        },
+      ],
+      thumbnail: {
+        path: 'http://i.annihil.us/u/prod/marvel/i/mg/e/03/587fe42345084',
+        extension: 'jpg',
+      },
+      images: [
+        {
+          path: 'http://i.annihil.us/u/prod/marvel/i/mg/e/03/587fe42345084',
+          extension: 'jpg',
+        },
+        {
+          path: 'http://i.annihil.us/u/prod/marvel/i/mg/c/b0/4c659cf8b32eb',
+          extension: 'jpg',
+        },
+      ],
+      creators: {
+        available: 7,
+        collectionURI:
+          'http://gateway.marvel.com/v1/public/comics/7010/creators',
+        items: [
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/954',
+            name: 'Gerry Conway',
+            role: 'writer',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/104',
+            name: 'Steve Englehart',
+            role: 'writer',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/946',
+            name: 'Jim Shooter',
+            role: 'writer',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/103',
+            name: 'George Perez',
+            role: 'penciler',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/1529',
+            name: 'John Tartaglione',
+            role: 'inker',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/1777',
+            name: 'Don Warfield',
+            role: 'colorist',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/5205',
+            name: 'Irving Watanabe',
+            role: 'letterer',
+          },
+        ],
+        returned: 7,
+      },
+      characters: {
+        available: 11,
+        collectionURI:
+          'http://gateway.marvel.com/v1/public/comics/7010/characters',
+        items: [
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1009165',
+            name: 'Avengers',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1009175',
+            name: 'Beast',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1009189',
+            name: 'Black Widow',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1010351',
+            name: 'Hellcat (Patsy Walker)',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1009343',
+            name: 'Hercules',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1009368',
+            name: 'Iron Man',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1009451',
+            name: 'Moondragon',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1009562',
+            name: 'Scarlet Witch',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1009664',
+            name: 'Thor',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1009697',
+            name: 'Vision',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1009719',
+            name: 'Wonder Man',
+          },
+        ],
+        returned: 11,
+      },
+      stories: {
+        available: 3,
+        collectionURI:
+          'http://gateway.marvel.com/v1/public/comics/7010/stories',
+        items: [
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/stories/14557',
+            name: 'AVENGERS (1963) #151',
+            type: 'cover',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/stories/14558',
+            name: 'At Last: The Decision!',
+            type: 'interiorStory',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/stories/146931',
+            name: 'story from Avengers (1963) #151',
+            type: 'interiorStory',
+          },
+        ],
+        returned: 3,
+      },
+      events: {
+        available: 0,
+        collectionURI: 'http://gateway.marvel.com/v1/public/comics/7010/events',
+        items: [],
+        returned: 0,
+      },
+    },
+    {
+      id: 20355,
+      digitalId: 48500,
+      title: 'Defenders (1972) #46',
+      issueNumber: 46,
+      variantDescription: '',
+      description:
+        "Amid Doctor Strange's announcement that he's leaving the group, the new and remaining members try to persuade the Hulk not to follow suit.",
+      modified: '2018-05-04T17:57:36-0400',
+      isbn: '',
+      upc: '',
+      diamondCode: '',
+      ean: '',
+      issn: '',
+      format: 'Comic',
+      pageCount: 0,
+      textObjects: [
+        {
+          type: 'issue_solicit_text',
+          language: 'en-us',
+          text:
+            "Amid Doctor Strange's announcement that he's leaving the group, the new and remaining members try to persuade the Hulk not to follow suit.",
+        },
+      ],
+      resourceURI: 'http://gateway.marvel.com/v1/public/comics/20355',
+      urls: [
+        {
+          type: 'detail',
+          url:
+            'http://marvel.com/comics/issue/20355/defenders_1972_46?utm_campaign=apiRef&utm_source=540f9d60e73b2d4db9fc08aaae0c89b4',
+        },
+        {
+          type: 'reader',
+          url:
+            'http://marvel.com/digitalcomics/view.htm?iid=48500&utm_campaign=apiRef&utm_source=540f9d60e73b2d4db9fc08aaae0c89b4',
+        },
+      ],
+      series: {
+        resourceURI: 'http://gateway.marvel.com/v1/public/series/3743',
+        name: 'Defenders (1972 - 1986)',
+      },
+      variants: [],
+      collections: [],
+      collectedIssues: [],
+      dates: [
+        {
+          type: 'onsaleDate',
+          date: '1977-04-01T00:00:00-0500',
+        },
+        {
+          type: 'focDate',
+          date: '-0001-11-30T00:00:00-0500',
+        },
+        {
+          type: 'unlimitedDate',
+          date: '2018-05-07T00:00:00-0400',
+        },
+      ],
+      prices: [
+        {
+          type: 'printPrice',
+          price: 0,
+        },
+      ],
+      thumbnail: {
+        path: 'http://i.annihil.us/u/prod/marvel/i/mg/f/40/5aeb56f37cb3c',
+        extension: 'jpg',
+      },
+      images: [
+        {
+          path: 'http://i.annihil.us/u/prod/marvel/i/mg/f/40/5aeb56f37cb3c',
+          extension: 'jpg',
+        },
+        {
+          path: 'http://i.annihil.us/u/prod/marvel/i/mg/f/a0/53b43f6054003',
+          extension: 'jpg',
+        },
+      ],
+      creators: {
+        available: 9,
+        collectionURI:
+          'http://gateway.marvel.com/v1/public/comics/20355/creators',
+        items: [
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/1778',
+            name: 'Dan Crespi',
+            role: 'penciller (cover)',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/965',
+            name: 'Ed Hannigan',
+            role: 'penciller (cover)',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/400',
+            name: 'Keith Giffen',
+            role: 'penciler',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/1178',
+            name: 'Archie Goodwin',
+            role: 'editor',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/13094',
+            name: 'Dave Hunt',
+            role: 'colorist',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/570',
+            name: 'Klaus Janson',
+            role: 'inker',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/1330',
+            name: 'David Anthony Kraft',
+            role: 'writer',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/1237',
+            name: 'Roger Slifer',
+            role: 'writer',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/5205',
+            name: 'Irving Watanabe',
+            role: 'letterer',
+          },
+        ],
+        returned: 9,
+      },
+      characters: {
+        available: 8,
+        collectionURI:
+          'http://gateway.marvel.com/v1/public/comics/20355/characters',
+        items: [
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1011023',
+            name: 'Defenders',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1009282',
+            name: 'Doctor Strange',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1010351',
+            name: 'Hellcat (Patsy Walker)',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1009351',
+            name: 'Hulk',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1009471',
+            name: 'Nick Fury',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1010349',
+            name: 'Nighthawk',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1009610',
+            name: 'Spider-Man',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1010350',
+            name: 'Valkyrie (Samantha Parrington)',
+          },
+        ],
+        returned: 8,
+      },
+      stories: {
+        available: 6,
+        collectionURI:
+          'http://gateway.marvel.com/v1/public/comics/20355/stories',
+        items: [
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/stories/43611',
+            name: '[Who Remembers Scorpio?!*]',
+            type: 'cover',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/stories/43612',
+            name: 'Who Remembers Scorpio?',
+            type: 'interiorStory',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/stories/43613',
+            name: '[Defenders Dialogue]',
+            type: 'letters',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/stories/43614',
+            name: 'The Champ',
+            type: 'ad',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/stories/148607',
+            name: 'cover from Defenders (1972) #46',
+            type: 'cover',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/stories/148608',
+            name: 'story from Defenders (1972) #46',
+            type: 'interiorStory',
+          },
+        ],
+        returned: 6,
+      },
+      events: {
+        available: 0,
+        collectionURI:
+          'http://gateway.marvel.com/v1/public/comics/20355/events',
+        items: [],
+        returned: 0,
+      },
+    },
+    {
+      id: 20356,
+      digitalId: 35091,
+      title: 'Defenders (1972) #47',
+      issueNumber: 47,
+      variantDescription: '',
+      description:
+        'The Defenders attempt some R&R time, until Jack Norriss finds himself in hot water with Nick Fury! On her return to Avengers Mansion, Hellcat is attacked by an amnesiac Wonder-Man. What has pushed Wonder Man over the edge? And will the Defenders be able to bail Norriss out of his latest woes?',
+      modified: '2016-10-20T16:28:39-0400',
+      isbn: '',
+      upc: '',
+      diamondCode: '',
+      ean: '',
+      issn: '',
+      format: 'Comic',
+      pageCount: 0,
+      textObjects: [
+        {
+          type: 'issue_solicit_text',
+          language: 'en-us',
+          text:
+            'The Defenders attempt some R&R time, until Jack Norriss finds himself in hot water with Nick Fury! On her return to Avengers Mansion, Hellcat is attacked by an amnesiac Wonder-Man. What has pushed Wonder Man over the edge? And will the Defenders be able to bail Norriss out of his latest woes?',
+        },
+      ],
+      resourceURI: 'http://gateway.marvel.com/v1/public/comics/20356',
+      urls: [
+        {
+          type: 'detail',
+          url:
+            'http://marvel.com/comics/issue/20356/defenders_1972_47?utm_campaign=apiRef&utm_source=540f9d60e73b2d4db9fc08aaae0c89b4',
+        },
+        {
+          type: 'purchase',
+          url:
+            'http://comicstore.marvel.com/Defenders-47/digital-comic/35091?utm_campaign=apiRef&utm_source=540f9d60e73b2d4db9fc08aaae0c89b4',
+        },
+        {
+          type: 'reader',
+          url:
+            'http://marvel.com/digitalcomics/view.htm?iid=35091&utm_campaign=apiRef&utm_source=540f9d60e73b2d4db9fc08aaae0c89b4',
+        },
+        {
+          type: 'inAppLink',
+          url:
+            'https://applink.marvel.com/issue/35091?utm_campaign=apiRef&utm_source=540f9d60e73b2d4db9fc08aaae0c89b4',
+        },
+      ],
+      series: {
+        resourceURI: 'http://gateway.marvel.com/v1/public/series/3743',
+        name: 'Defenders (1972 - 1986)',
+      },
+      variants: [],
+      collections: [],
+      collectedIssues: [],
+      dates: [
+        {
+          type: 'onsaleDate',
+          date: '1977-05-10T00:00:00-0400',
+        },
+        {
+          type: 'focDate',
+          date: '-0001-11-30T00:00:00-0500',
+        },
+        {
+          type: 'unlimitedDate',
+          date: '2016-10-24T00:00:00-0400',
+        },
+        {
+          type: 'digitalPurchaseDate',
+          date: '2014-09-23T00:00:00-0400',
+        },
+      ],
+      prices: [
+        {
+          type: 'printPrice',
+          price: 0.3,
+        },
+        {
+          type: 'digitalPurchasePrice',
+          price: 1.99,
+        },
+      ],
+      thumbnail: {
+        path: 'http://i.annihil.us/u/prod/marvel/i/mg/d/70/57d95d779faae',
+        extension: 'jpg',
+      },
+      images: [
+        {
+          path: 'http://i.annihil.us/u/prod/marvel/i/mg/d/70/57d95d779faae',
+          extension: 'jpg',
+        },
+      ],
+      creators: {
+        available: 11,
+        collectionURI:
+          'http://gateway.marvel.com/v1/public/comics/20356/creators',
+        items: [
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/1746',
+            name: 'John Costanza',
+            role: 'letterer',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/1754',
+            name: 'Gaspar Saladino',
+            role: 'letterer',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/1778',
+            name: 'Dan Crespi',
+            role: 'penciller (cover)',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/965',
+            name: 'Ed Hannigan',
+            role: 'penciller (cover)',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/1240',
+            name: 'Joe Sinnott',
+            role: 'penciller (cover)',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/400',
+            name: 'Keith Giffen',
+            role: 'penciler',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/1178',
+            name: 'Archie Goodwin',
+            role: 'editor',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/570',
+            name: 'Klaus Janson',
+            role: 'inker',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/1330',
+            name: 'David Anthony Kraft',
+            role: 'writer',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/1237',
+            name: 'Roger Slifer',
+            role: 'writer',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/2747',
+            name: 'John Warner',
+            role: 'writer',
+          },
+        ],
+        returned: 11,
+      },
+      characters: {
+        available: 4,
+        collectionURI:
+          'http://gateway.marvel.com/v1/public/comics/20356/characters',
+        items: [
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1011023',
+            name: 'Defenders',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1010351',
+            name: 'Hellcat (Patsy Walker)',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1009452',
+            name: 'Moon Knight',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1009719',
+            name: 'Wonder Man',
+          },
+        ],
+        returned: 4,
+      },
+      stories: {
+        available: 2,
+        collectionURI:
+          'http://gateway.marvel.com/v1/public/comics/20356/stories',
+        items: [
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/stories/43615',
+            name: 'Cover to Defenders #47',
+            type: 'cover',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/stories/43616',
+            name: 'Story to Defenders #47',
+            type: 'interiorStory',
+          },
+        ],
+        returned: 2,
+      },
+      events: {
+        available: 0,
+        collectionURI:
+          'http://gateway.marvel.com/v1/public/comics/20356/events',
+        items: [],
+        returned: 0,
+      },
+    },
+    {
+      id: 20357,
+      digitalId: 35092,
+      title: 'Defenders (1972) #48',
+      issueNumber: 48,
+      variantDescription: '',
+      description:
+        'The Defenders decide to turn Jack Norriss over to S.H.I.E.L.D.  The team realizes too late that the “Nick Fury” they encountered is an imposter working for Scorpio! Moon Knight steps in to help locate Scorpio’s headquarters. Will the Defenders, with the help of Moon Knight, be able to withstand an army of Zodiac androids?',
+      modified: '2016-10-20T16:29:12-0400',
+      isbn: '',
+      upc: '',
+      diamondCode: '',
+      ean: '',
+      issn: '',
+      format: 'Comic',
+      pageCount: 0,
+      textObjects: [
+        {
+          type: 'issue_solicit_text',
+          language: 'en-us',
+          text:
+            'The Defenders decide to turn Jack Norriss over to S.H.I.E.L.D.  The team realizes too late that the “Nick Fury” they encountered is an imposter working for Scorpio! Moon Knight steps in to help locate Scorpio’s headquarters. Will the Defenders, with the help of Moon Knight, be able to withstand an army of Zodiac androids?',
+        },
+      ],
+      resourceURI: 'http://gateway.marvel.com/v1/public/comics/20357',
+      urls: [
+        {
+          type: 'detail',
+          url:
+            'http://marvel.com/comics/issue/20357/defenders_1972_48?utm_campaign=apiRef&utm_source=540f9d60e73b2d4db9fc08aaae0c89b4',
+        },
+        {
+          type: 'purchase',
+          url:
+            'http://comicstore.marvel.com/Defenders-48/digital-comic/35092?utm_campaign=apiRef&utm_source=540f9d60e73b2d4db9fc08aaae0c89b4',
+        },
+        {
+          type: 'reader',
+          url:
+            'http://marvel.com/digitalcomics/view.htm?iid=35092&utm_campaign=apiRef&utm_source=540f9d60e73b2d4db9fc08aaae0c89b4',
+        },
+        {
+          type: 'inAppLink',
+          url:
+            'https://applink.marvel.com/issue/35092?utm_campaign=apiRef&utm_source=540f9d60e73b2d4db9fc08aaae0c89b4',
+        },
+      ],
+      series: {
+        resourceURI: 'http://gateway.marvel.com/v1/public/series/3743',
+        name: 'Defenders (1972 - 1986)',
+      },
+      variants: [],
+      collections: [],
+      collectedIssues: [],
+      dates: [
+        {
+          type: 'onsaleDate',
+          date: '1977-06-10T00:00:00-0400',
+        },
+        {
+          type: 'focDate',
+          date: '-0001-11-30T00:00:00-0500',
+        },
+        {
+          type: 'unlimitedDate',
+          date: '2016-10-24T00:00:00-0400',
+        },
+        {
+          type: 'digitalPurchaseDate',
+          date: '2014-09-23T00:00:00-0400',
+        },
+      ],
+      prices: [
+        {
+          type: 'printPrice',
+          price: 0.3,
+        },
+        {
+          type: 'digitalPurchasePrice',
+          price: 1.99,
+        },
+      ],
+      thumbnail: {
+        path: 'http://i.annihil.us/u/prod/marvel/i/mg/b/03/57d95e8170601',
+        extension: 'jpg',
+      },
+      images: [
+        {
+          path: 'http://i.annihil.us/u/prod/marvel/i/mg/b/03/57d95e8170601',
+          extension: 'jpg',
+        },
+      ],
+      creators: {
+        available: 8,
+        collectionURI:
+          'http://gateway.marvel.com/v1/public/comics/20357/creators',
+        items: [
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/400',
+            name: 'Keith Giffen',
+            role: 'penciler',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/965',
+            name: 'Ed Hannigan',
+            role: 'penciler',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/1178',
+            name: 'Archie Goodwin',
+            role: 'editor',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/1326',
+            name: 'Dan Green',
+            role: 'inker',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/1240',
+            name: 'Joe Sinnott',
+            role: 'inker',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/1806',
+            name: 'Annette Kawecki',
+            role: 'letterer',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/1330',
+            name: 'David Anthony Kraft',
+            role: 'writer',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/8390',
+            name: 'Don Mcgregor',
+            role: 'writer',
+          },
+        ],
+        returned: 8,
+      },
+      characters: {
+        available: 5,
+        collectionURI:
+          'http://gateway.marvel.com/v1/public/comics/20357/characters',
+        items: [
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1011023',
+            name: 'Defenders',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1010351',
+            name: 'Hellcat (Patsy Walker)',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1009351',
+            name: 'Hulk',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1009452',
+            name: 'Moon Knight',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1010349',
+            name: 'Nighthawk',
+          },
+        ],
+        returned: 5,
+      },
+      stories: {
+        available: 2,
+        collectionURI:
+          'http://gateway.marvel.com/v1/public/comics/20357/stories',
+        items: [
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/stories/43617',
+            name: 'Cover to Defenders #48',
+            type: 'cover',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/stories/43618',
+            name: 'Story to Defenders #48',
+            type: 'interiorStory',
+          },
+        ],
+        returned: 2,
+      },
+      events: {
+        available: 0,
+        collectionURI:
+          'http://gateway.marvel.com/v1/public/comics/20357/events',
+        items: [],
+        returned: 0,
+      },
+    },
+    {
+      id: 20358,
+      digitalId: 35095,
+      title: 'Defenders (1972) #49',
+      issueNumber: 49,
+      variantDescription: '',
+      description:
+        'Before Moon Knight can alert the Defenders on the whereabouts of Scorpio, Nighthawk is taken hostage. Meanwhile, the team attempts to convince an unruly Hulk to fight for them. With a friend in danger, and time running out, what measures will the Defenders take to get Hulk on their side?',
+      modified: '2016-10-20T16:29:36-0400',
+      isbn: '',
+      upc: '',
+      diamondCode: '',
+      ean: '',
+      issn: '',
+      format: 'Comic',
+      pageCount: 0,
+      textObjects: [
+        {
+          type: 'issue_solicit_text',
+          language: 'en-us',
+          text:
+            'Before Moon Knight can alert the Defenders on the whereabouts of Scorpio, Nighthawk is taken hostage. Meanwhile, the team attempts to convince an unruly Hulk to fight for them. With a friend in danger, and time running out, what measures will the Defenders take to get Hulk on their side?',
+        },
+      ],
+      resourceURI: 'http://gateway.marvel.com/v1/public/comics/20358',
+      urls: [
+        {
+          type: 'detail',
+          url:
+            'http://marvel.com/comics/issue/20358/defenders_1972_49?utm_campaign=apiRef&utm_source=540f9d60e73b2d4db9fc08aaae0c89b4',
+        },
+        {
+          type: 'purchase',
+          url:
+            'http://comicstore.marvel.com/Defenders-49/digital-comic/35095?utm_campaign=apiRef&utm_source=540f9d60e73b2d4db9fc08aaae0c89b4',
+        },
+        {
+          type: 'reader',
+          url:
+            'http://marvel.com/digitalcomics/view.htm?iid=35095&utm_campaign=apiRef&utm_source=540f9d60e73b2d4db9fc08aaae0c89b4',
+        },
+        {
+          type: 'inAppLink',
+          url:
+            'https://applink.marvel.com/issue/35095?utm_campaign=apiRef&utm_source=540f9d60e73b2d4db9fc08aaae0c89b4',
+        },
+      ],
+      series: {
+        resourceURI: 'http://gateway.marvel.com/v1/public/series/3743',
+        name: 'Defenders (1972 - 1986)',
+      },
+      variants: [],
+      collections: [],
+      collectedIssues: [],
+      dates: [
+        {
+          type: 'onsaleDate',
+          date: '1977-07-10T00:00:00-0400',
+        },
+        {
+          type: 'focDate',
+          date: '-0001-11-30T00:00:00-0500',
+        },
+        {
+          type: 'unlimitedDate',
+          date: '2016-10-24T00:00:00-0400',
+        },
+        {
+          type: 'digitalPurchaseDate',
+          date: '2014-09-23T00:00:00-0400',
+        },
+      ],
+      prices: [
+        {
+          type: 'printPrice',
+          price: 0.3,
+        },
+        {
+          type: 'digitalPurchasePrice',
+          price: 1.99,
+        },
+      ],
+      thumbnail: {
+        path: 'http://i.annihil.us/u/prod/marvel/i/mg/4/40/57d9604f8f048',
+        extension: 'jpg',
+      },
+      images: [
+        {
+          path: 'http://i.annihil.us/u/prod/marvel/i/mg/4/40/57d9604f8f048',
+          extension: 'jpg',
+        },
+      ],
+      creators: {
+        available: 9,
+        collectionURI:
+          'http://gateway.marvel.com/v1/public/comics/20358/creators',
+        items: [
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/3198',
+            name: 'Howard Bender',
+            role: 'letterer',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/1778',
+            name: 'Dan Crespi',
+            role: 'letterer',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/1754',
+            name: 'Gaspar Saladino',
+            role: 'letterer',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/5205',
+            name: 'Irving Watanabe',
+            role: 'letterer',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/400',
+            name: 'Keith Giffen',
+            role: 'penciler',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/435',
+            name: 'Al Milgrom',
+            role: 'penciler',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/1178',
+            name: 'Archie Goodwin',
+            role: 'editor',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/1330',
+            name: 'David Anthony Kraft',
+            role: 'writer',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/creators/2755',
+            name: 'Mike Royer',
+            role: 'inker',
+          },
+        ],
+        returned: 9,
+      },
+      characters: {
+        available: 5,
+        collectionURI:
+          'http://gateway.marvel.com/v1/public/comics/20358/characters',
+        items: [
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1011023',
+            name: 'Defenders',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1010351',
+            name: 'Hellcat (Patsy Walker)',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1009351',
+            name: 'Hulk',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1009452',
+            name: 'Moon Knight',
+          },
+          {
+            resourceURI:
+              'http://gateway.marvel.com/v1/public/characters/1010350',
+            name: 'Valkyrie (Samantha Parrington)',
+          },
+        ],
+        returned: 5,
+      },
+      stories: {
+        available: 3,
+        collectionURI:
+          'http://gateway.marvel.com/v1/public/comics/20358/stories',
+        items: [
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/stories/43619',
+            name: 'Cover to Defenders #49',
+            type: 'cover',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/stories/43620',
+            name: 'Story to Defenders #49',
+            type: 'interiorStory',
+          },
+          {
+            resourceURI: 'http://gateway.marvel.com/v1/public/stories/43621',
+            name: 'Defenders Dialogue',
+            type: 'interiorStory',
+          },
+        ],
+        returned: 3,
+      },
+      events: {
+        available: 0,
+        collectionURI:
+          'http://gateway.marvel.com/v1/public/comics/20358/events',
+        items: [],
+        returned: 0,
+      },
+    },
+  ];
+  try {
+    // const response = await axios.get(url);
+    //take .id, .description, http://i.annihil.us/u/prod/marvel/i/mg/c/20/5d1f6b2c41a9e/standard_medium.jpg  thumbnail+ /standard_medium.jpg
+    // return res.send(response.data.data.results);
+    return res.send(dumData);
+  } catch (e) {
+    return res.send({ error: e.message });
+  }
+});
+
+//
 module.exports = router;

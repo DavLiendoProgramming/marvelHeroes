@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import styled from 'styled-components';
 import img from '../img/portrait_uncanny.jpg';
 import { FavStar } from '../base/FavButton';
+import CharactersModal from './CharactersModal';
 const Card = styled.div`
   text-align: justify;
   padding: 24px;
@@ -22,7 +23,7 @@ const Card = styled.div`
 `;
 
 const FavIcon = styled(FavStar)`
-  transform: translate(160px, -140px);
+  transform: translate(160px, -160px);
   padding: 15px;
 `;
 //For image replace: character.thumbnail.path
@@ -33,10 +34,20 @@ const FavIcon = styled(FavStar)`
 // }
 const CharactersCard = ({ character }) => {
   // console.log(character);
+  // const showComics = () => {
+  //   comicView === false ? (comicView = true) : (comicView = false);
+  //   console.log(comicView, 'youclickedmenigga');
+  // };
+  console.log(character, 'im the char');
+  const useToggle = (initial) => {
+    const [open, setOpen] = useState(initial);
+    return [open, useCallback(() => setOpen((status) => !status))];
+  };
+  const [open, toggle] = useToggle(false);
   return character === undefined ? (
     ''
   ) : (
-    <Card>
+    <Card onClick={() => toggle()}>
       <FavIcon>
         <polygon
           points="32,47 12,62 20,38 2,24 24,24 32,1 40,24 
@@ -44,6 +55,8 @@ const CharactersCard = ({ character }) => {
         ></polygon>
       </FavIcon>
       <h3> {character.name} </h3>
+      <CharactersModal open={open} toggle={toggle} character={character} />
+      {/* <CharactersComics comicsView={comicsView} /> */}
     </Card>
   );
 };

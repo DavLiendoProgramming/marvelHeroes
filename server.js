@@ -5,7 +5,7 @@ const MARVEL_KEY_PUBLIC = '540f9d60e73b2d4db9fc08aaae0c89b4';
 //Middleware
 app.use(express.json({ extended: false }));
 app.use(cors());
-//Rutas
+//Routes
 
 app.use('/api', require('./routes/api/character'));
 

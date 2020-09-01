@@ -17,7 +17,7 @@ const Characters = (props) => {
   useEffect(() => {
     const fetchData = async () => {
       const response = await axios('http://localhost:5000/api');
-      setData({ data: response.data.results });
+      setData({ data: response.data });
     };
     fetchData();
   }, []);
@@ -28,7 +28,7 @@ const Characters = (props) => {
   ) : (
     <Fragment>
       <CharacterContainer>
-        {/*console.log(data.data)*/}
+        {console.log(data.data, 'im the data you want')}
         {data.data.map((character) => (
           <CharactersCard character={character} key={character.id} />
         ))}
