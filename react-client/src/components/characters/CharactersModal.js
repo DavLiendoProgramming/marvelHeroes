@@ -78,7 +78,6 @@ const CharacterModal = ({ children, open, toggle, character }) => {
     };
     fetchData();
   }, []);
-
   return (
     <Portal>
       {open && (

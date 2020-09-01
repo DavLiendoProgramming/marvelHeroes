@@ -58,11 +58,15 @@ const ComicMin = ({ comics, name }) => {
     <ListWrapper>
       {console.log(comics, 'dude, you in')}
       {comics.data.map((comic) => (
-        <ComicWrapper>
+        <ComicWrapper key={comic.id}>
           <ComicImage img={comic.images[0].path} />
           <div>
             <h2>{name}</h2>
-            <h3>{comic.description}</h3>
+            {comic.description === null ? (
+              <h3>No description Available </h3>
+            ) : (
+              <h3>{comic.description}</h3>
+            )}
           </div>
         </ComicWrapper>
       ))}

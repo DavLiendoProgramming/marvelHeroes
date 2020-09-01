@@ -1,8 +1,11 @@
 const express = require('express');
+const bodyParser = require('body-parser');
 const app = express();
 const cors = require('cors');
 const MARVEL_KEY_PUBLIC = '540f9d60e73b2d4db9fc08aaae0c89b4';
 //Middleware
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json({ extended: false }));
 app.use(cors());
 //Routes

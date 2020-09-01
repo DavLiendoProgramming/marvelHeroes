@@ -12,12 +12,12 @@ const Card = styled.div`
   cursor: pointer;
   background-image: url(${img});
   & h3 {
+    color: white;
     position: absolute;
     text-align: start;
     max-width: 208px;
     font-size: 20px;
     transform: translate(0px, 288px);
-    color: #ffffff;
     font-family: roboto, sans-serif;
   }
 `;
@@ -38,7 +38,6 @@ const CharactersCard = ({ character }) => {
   //   comicView === false ? (comicView = true) : (comicView = false);
   //   console.log(comicView, 'youclickedmenigga');
   // };
-  console.log(character, 'im the char');
   const useToggle = (initial) => {
     const [open, setOpen] = useState(initial);
     return [open, useCallback(() => setOpen((status) => !status))];

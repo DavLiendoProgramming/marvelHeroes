@@ -1,8 +1,17 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import styled from 'styled-components';
 import { FavButton } from '../base/FavButton';
 import SwitchButton from '../base/SwitchButton';
 import ThemeContext from 'styled-components';
+import { Router, Redirect } from 'react-router-dom';
+
+//SomeMiddleware to differentiate input
+
+const isUrl = function (str) {
+  let baseUrl = 'https://www.marvel.com/comics/issue/';
+  return str.search(baseUrl) !== -1;
+};
+
 const Navbar = styled.nav`
   background-color: ${(props) => props.theme.primaryBackground};
   width: 100%;
@@ -42,8 +51,18 @@ const NavIcon = styled.svg`
   margin-right: 5px;
 `;
 
-const Header = ({ setTheme, themeVal }) => {
+const Header = ({ setTheme, themeVal, setInput, input }) => {
   const theme = useContext(ThemeContext);
+  const [redirect, setRedirect] = useState('off');
+  const onKeyDown = (event) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      event.stopPropagation();
+      console.log(' you pressed me', event.target.value);
+      setInput(event.target.value);
+      setRedirect('on');
+    }
+  };
   return (
     <Navbar theme={theme}>
       <NavIcon
@@ -81,9 +100,22 @@ const Header = ({ setTheme, themeVal }) => {
           </g>
         </g>
       </NavIcon>
-      <Input type="text" placeholder="Buscar" theme={theme} />
+      <Input
+        type="text"
+        placeholder="Buscar"
+        theme={theme}
+        onKeyDown={onKeyDown}
+      />
+
       <FavButton />
       <SwitchButton setTheme={setTheme} themeVal={themeVal} />
+      {redirect === 'off' ? (
+        ''
+      ) : isUrl(input) === true ? (
+        <Redirect to="/comic" />
+      ) : (
+        <Redirect to="/character" />
+      )}
     </Navbar>
   );
 };

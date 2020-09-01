@@ -11,23 +11,28 @@ const CharacterContainer = styled.div`
   grid-column-gap: 36px;
   grid-row-gap: 36px;
 `;
-const Characters = (props) => {
-  // console.log(props);
+const CharacterSearched = ({ input }) => {
   const [data, setData] = useState();
+
   useEffect(() => {
     const fetchData = async () => {
-      const response = await axios('http://localhost:5000/api');
+      const response = await axios({
+        method: 'post',
+        url: 'http://localhost:5000/api/character',
+        data: { name: input },
+      });
       setData({ data: response.data });
     };
     fetchData();
   }, []);
   return data === undefined || data === {} ? (
     <Fragment>
-      <h1>Waiting for data</h1>
+      <h1>No results</h1>
     </Fragment>
   ) : (
     <Fragment>
       <CharacterContainer>
+        {console.log(data.data, 'im the data you want')}
         {data.data.map((character) => (
           <CharactersCard character={character} key={character.id} />
         ))}
@@ -36,4 +41,4 @@ const Characters = (props) => {
   );
 };
 
-export default Characters;
+export default CharacterSearched;
