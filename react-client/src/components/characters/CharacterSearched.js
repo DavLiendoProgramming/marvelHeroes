@@ -35,8 +35,8 @@ const CharacterSearched = ({ input }) => {
   ) : (
     <Fragment>
       <CharacterContainer>
-        {console.log(data, 'im the data you want')}
-        {data.data.results.map((character) => (
+        {console.log(data.data.data, 'im the data you want')}
+        {data.data.data.results.map((character) => (
           <CharactersCard character={character} key={character.id} />
         ))}
       </CharacterContainer>
