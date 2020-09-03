@@ -19,8 +19,7 @@
     "express": "^4.17.1",
     "md5": "^2.3.0",
     "concurrently": "^5.3.0",
-    "dotenv": "^8.2.0",
-    "build": "npm install"
+    "dotenv": "^8.2.0"
   },
   "devDependencies": {
     "concurrently": "^5.3.0",
