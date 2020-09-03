@@ -13,17 +13,20 @@ const CharacterContainer = styled.div`
 `;
 const CharacterSearched = ({ input }) => {
   const [data, setData] = useState();
-
+  console.log(input, 'im your input in search');
   useEffect(() => {
     const fetchData = async () => {
+      console.log(input, 'im the input in fetchdata');
       const response = await axios({
         method: 'post',
         url: 'http://localhost:5000/api/character',
         data: { name: input },
       });
+
       setData({ data: response.data });
     };
     fetchData();
+    console.log('Im the data in search', data);
   }, []);
   return data === undefined || data === {} ? (
     <Fragment>
@@ -32,8 +35,8 @@ const CharacterSearched = ({ input }) => {
   ) : (
     <Fragment>
       <CharacterContainer>
-        {console.log(data.data, 'im the data you want')}
-        {data.data.map((character) => (
+        {console.log(data, 'im the data you want')}
+        {data.data.results.map((character) => (
           <CharactersCard character={character} key={character.id} />
         ))}
       </CharacterContainer>

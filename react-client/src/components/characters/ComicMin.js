@@ -52,7 +52,7 @@ const ComicDescription = styled.h3`
 
 const ComicMin = ({ comics, name }) => {
   console.log(comics, 'im the modals comic');
-  return comics === undefined || comics === {} ? (
+  return comics === undefined || comics.data.error ? (
     ' '
   ) : (
     <ListWrapper>

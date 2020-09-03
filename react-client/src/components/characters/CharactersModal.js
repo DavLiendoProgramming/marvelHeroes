@@ -64,11 +64,12 @@ const Portal = ({ children }) => {
 };
 
 const CharacterModal = ({ children, open, toggle, character }) => {
+  console.log(character);
   const [data, setData] = useState();
   useEffect(() => {
     const fetchData = async () => {
       const response = await axios({
-        method: 'get',
+        method: 'post',
         url: 'http://localhost:5000/api/character/comics',
         data: {
           id: character.id,

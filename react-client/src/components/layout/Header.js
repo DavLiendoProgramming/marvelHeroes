@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { FavButton } from '../base/FavButton';
 import SwitchButton from '../base/SwitchButton';
 import ThemeContext from 'styled-components';
-import { Router, Redirect } from 'react-router-dom';
+import { Redirect } from 'react-router-dom';
 
 //SomeMiddleware to differentiate input
 
@@ -59,9 +59,15 @@ const Header = ({ setTheme, themeVal, setInput, input }) => {
       event.preventDefault();
       event.stopPropagation();
       console.log(' you pressed me', event.target.value);
-      setInput(event.target.value);
+      // setInput(event.target.value);
       setRedirect('on');
     }
+    console.log(
+      input,
+      'im the changed input',
+      event.target.value,
+      'im the supposed value'
+    );
   };
   return (
     <Navbar theme={theme}>
@@ -105,13 +111,14 @@ const Header = ({ setTheme, themeVal, setInput, input }) => {
         placeholder="Buscar"
         theme={theme}
         onKeyDown={onKeyDown}
+        onInput={(e) => setInput(e.target.value)}
       />
 
       <FavButton />
       <SwitchButton setTheme={setTheme} themeVal={themeVal} />
       {redirect === 'off' ? (
         ''
-      ) : isUrl(input) === true ? (
+      ) : isUrl(input) === true || input === '' ? (
         <Redirect to="/comic" />
       ) : (
         <Redirect to="/character" />

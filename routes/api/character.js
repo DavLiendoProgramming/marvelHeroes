@@ -18,8 +18,8 @@ const comicId = require('../../middleware/getComicId');
 //Request Parameters: name, namestartswith,modifiedsince,comics,series,events,stories,orderby
 router.post('/character', async (req, res) => {
   //Config Variables
-  console.log(req.body.input, 'im your body');
-  let name = req.body.input;
+  console.log(req.body, 'im your body /character');
+  let name = req.body.name;
   let ts = new Date().getTime();
   let str = ts.toString() + process.env.MARVEL_KEY_PRIVATE + publicKey;
   let hash = md5(str);
@@ -28,13 +28,13 @@ router.post('/character', async (req, res) => {
   let limit = req.body.limit;
   let offset = req.body.offset;
   let skip = req.body.skip;
+
   const url = `https://gateway.marvel.com:443/v1/public/characters?nameStartsWith=${name}&ts=${ts}&apikey=${publicKey}&hash=${hash}`;
   try {
     const response = await axios.get(url);
-    console.log(response.data);
     return res.send(response.data);
   } catch (e) {
-    return res.end({ error: e.message });
+    return res.send({ error: e.message });
   }
 });
 
@@ -69,6 +69,7 @@ router.get('/characterid/:id', async (req, res) => {
 // NO REQUEST PARAMETERS RETURNS RANDOM CHARACTER
 router.get('/', async (req, res) => {
   //Config Variables
+  console.log('you are in / ');
   let ts = new Date().getTime();
   let str = ts.toString() + process.env.MARVEL_KEY_PRIVATE + publicKey;
   let hash = md5(str);
@@ -79,7 +80,6 @@ router.get('/', async (req, res) => {
   try {
     const response = await axios.get(url);
     return res.send(response.data.data.results);
-    // return res.send(data.results);
   } catch (e) {
     return res.send({ error: e.message });
   }
@@ -88,7 +88,7 @@ router.get('/', async (req, res) => {
 //Tested for:  'http://gateway.marvel.com/v1/public/comics/17752'
 //http://gateway.marvel.com/v1/public/comics/16897.jpg Example of comic
 //Route @GET FOR GETTING COMIC INFORMATION USING COMIC'S ID
-router.get('/comic', async (req, res) => {
+router.post('/comic', async (req, res) => {
   //Config Variables
   // let id = req.body.id;
   //data.results.title data.results.description data.results.thumnbnail.path + string to select the type of img
@@ -96,12 +96,13 @@ router.get('/comic', async (req, res) => {
   let str = ts.toString() + process.env.MARVEL_KEY_PRIVATE + publicKey;
   let hash = md5(str);
   let date = new Date('1940-1-1');
-  let id = comicId('http://gateway.marvel.com/v1/public/comics/17752');
+  // let id = comicId('http://gateway.marvel.com/v1/public/comics/17752');
+  let id = req.body.id;
+  console.log('imyour id', req.body);
   let url = `https://gateway.marvel.com:443/v1/public/comics?&id=${id}&ts=${ts}&apikey=${publicKey}&hash=${hash}`;
-
   try {
     const response = await axios.get(url);
-    return res.send(response.data.data);
+    return res.send(url);
   } catch (e) {
     return res.send({ error: e.message });
   }
@@ -109,8 +110,8 @@ router.get('/comic', async (req, res) => {
 
 //Tested for:  'https://gateway.marvel.com:443/v1/public/characters/1010351/comics?orderBy=onsaleDate&limit=20&apikey=540f9d60e73b2d4db9fc08aaae0c89b4'
 //http://gateway.marvel.com/v1/public/comics/16897.jpg
-//Route @GET FOR GETTING LIST OF COMICS OF A CHARACTER
-router.get('/character/comics', async (req, res) => {
+//Route @GET FOR GETTING LIST OF COMICS OF A CHARACTER (uses post because it needs an id to return character)
+router.post('/character/comics', async (req, res) => {
   //Config Variables
   console.log(req.body, 'im the body dude');
   let id = req.body.id;
@@ -124,7 +125,6 @@ router.get('/character/comics', async (req, res) => {
     const response = await axios.get(url);
     //take .id, .description, http://i.annihil.us/u/prod/marvel/i/mg/c/20/5d1f6b2c41a9e/standard_medium.jpg  thumbnail+ /standard_medium.jpg
     return res.send(response.data.data.results);
-    return res.send(dumData);
   } catch (e) {
     return res.send({ error: e.message });
   }

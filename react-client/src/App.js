@@ -11,7 +11,8 @@ import { GlobalStyles } from './components/layout/GlobalStyle';
 import { lightTheme, darkTheme } from './components/layout/Themes';
 const App = () => {
   const [theme, setTheme] = useState('light');
-  const [input, setInput] = useState();
+  const [input, setInput] = useState('');
+  console.log('im the input in app', input);
   return (
     <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
       <Router>
@@ -27,13 +28,13 @@ const App = () => {
             <Characters />
           </Route>
           <Route exact path="/character">
-            <CharactersSearched char setChar />
+            <CharactersSearched input={input} />
           </Route>
           <Route exact path="/favorites">
             <CharactersFav />
           </Route>
           <Route exact path="/comic">
-            <ComicView input />
+            <ComicView input={input} />
           </Route>
         </Switch>
       </Router>

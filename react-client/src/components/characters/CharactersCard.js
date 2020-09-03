@@ -1,6 +1,5 @@
 import React, { useState, useCallback } from 'react';
 import styled from 'styled-components';
-import img from '../img/portrait_uncanny.jpg';
 import { FavStar } from '../base/FavButton';
 import CharactersModal from './CharactersModal';
 const Card = styled.div`
@@ -10,7 +9,7 @@ const Card = styled.div`
   height: 380px;
   border-radius: 3px;
   cursor: pointer;
-  background-image: url(${img});
+  background-image: url(${(props) => props.img + '/portrait_uncanny.jpg'});
   & h3 {
     color: white;
     position: absolute;
@@ -33,11 +32,7 @@ const FavIcon = styled(FavStar)`
 // portrait_uncanny
 // }
 const CharactersCard = ({ character }) => {
-  // console.log(character);
   // const showComics = () => {
-  //   comicView === false ? (comicView = true) : (comicView = false);
-  //   console.log(comicView, 'youclickedmenigga');
-  // };
   const useToggle = (initial) => {
     const [open, setOpen] = useState(initial);
     return [open, useCallback(() => setOpen((status) => !status))];
@@ -46,7 +41,7 @@ const CharactersCard = ({ character }) => {
   return character === undefined ? (
     ''
   ) : (
-    <Card onClick={() => toggle()}>
+    <Card onClick={() => toggle()} img={character.thumbnail.path}>
       <FavIcon>
         <polygon
           points="32,47 12,62 20,38 2,24 24,24 32,1 40,24 
