@@ -1,10 +1,11 @@
 import React, { useContext, useState } from 'react';
 import styled from 'styled-components';
 import { FavButton } from '../base/FavButton';
+import HeaderSeparator from '../base/HeaderSeparator';
 import SwitchButton from '../base/SwitchButton';
 import ThemeContext from 'styled-components';
 import { Redirect } from 'react-router-dom';
-
+import getQueryVariables from '../../react_middleware/getQueryVariables';
 //SomeMiddleware to differentiate input
 
 const isUrl = function (str) {
@@ -22,7 +23,7 @@ const Navbar = styled.nav`
   transition: all 0.4s ease;
 `;
 const Input = styled.input`
-  background-color: ${(props) => props.theme.secondaryBackground};
+  background-color: ${(props) => props.theme.primaryBackground};
   height: 100%;
   width: 70%;
   font-size: 24px;
@@ -30,11 +31,10 @@ const Input = styled.input`
   color: ${(props) => props.theme.primaryText};
   font-family: Roboto, sans-serif;
   border: #dbdbdb;
-  padding: 7px 33px;
+  padding: 7px;
   cursor: text;
   text-align: left;
   float: left;
-  border-radius: 10px;
   ::placeholder {
     color: #a8a8a8;
   }
@@ -52,22 +52,16 @@ const NavIcon = styled.svg`
 `;
 
 const Header = ({ setTheme, themeVal, setInput, input }) => {
+  // let queryStrings = getQueryVariables();
   const theme = useContext(ThemeContext);
   const [redirect, setRedirect] = useState('off');
   const onKeyDown = (event) => {
     if (event.key === 'Enter') {
       event.preventDefault();
       event.stopPropagation();
-      console.log(' you pressed me', event.target.value);
-      // setInput(event.target.value);
+
       setRedirect('on');
     }
-    console.log(
-      input,
-      'im the changed input',
-      event.target.value,
-      'im the supposed value'
-    );
   };
   return (
     <Navbar theme={theme}>
@@ -106,6 +100,7 @@ const Header = ({ setTheme, themeVal, setInput, input }) => {
           </g>
         </g>
       </NavIcon>
+      <HeaderSeparator />
       <Input
         type="text"
         placeholder="Buscar"
@@ -113,7 +108,7 @@ const Header = ({ setTheme, themeVal, setInput, input }) => {
         onKeyDown={onKeyDown}
         onInput={(e) => setInput(e.target.value)}
       />
-
+      <HeaderSeparator />
       <FavButton />
       <SwitchButton setTheme={setTheme} themeVal={themeVal} />
       {redirect === 'off' ? (

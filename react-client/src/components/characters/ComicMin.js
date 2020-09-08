@@ -41,14 +41,14 @@ const ComicImage = styled.img.attrs((props) => ({
   border-radius: 5px;
 `;
 
-const ComicDescription = styled.h3`
-  font-size: 14px;
-  font-weight: 300;
-  width: 300px;
-  float: right;
-  margin-top: 5px;
-  transform: translate(-10px, 1.5px);
-`;
+// const ComicDescription = styled.h3`
+//   font-size: 14px;
+//   font-weight: 300;
+//   width: 300px;
+//   float: right;
+//   margin-top: 5px;
+//   transform: translate(-10px, 1.5px);
+// `;
 
 const ComicMin = ({ comics, name }) => {
   console.log(comics, 'im the modals comic');

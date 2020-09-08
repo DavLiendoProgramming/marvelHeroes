@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-import AppContext from './AppContext';
+// import AppContext from './AppContext';
 import Header from './components/layout/Header';
 import Characters from './components/characters/Characters';
 import CharactersFav from './components/characters/CharactersFav';
@@ -12,7 +12,6 @@ import { lightTheme, darkTheme } from './components/layout/Themes';
 const App = () => {
   const [theme, setTheme] = useState('light');
   const [input, setInput] = useState('');
-  console.log('im the input in app', input);
   return (
     <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
       <Router>

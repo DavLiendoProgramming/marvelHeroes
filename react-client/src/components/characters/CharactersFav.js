@@ -1,36 +1,37 @@
 import React, { Fragment, useState, useEffect } from 'react';
 import CharactersCard from './CharactersCard';
 import axios from 'axios';
-import styled from 'styled-components';
+import { CharacterContainer } from '../base/CharacterContainer';
 
-const CharacterContainer = styled.div`
-  padding: 74px;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-template-rows: repeat(2, 1fr);
-  grid-column-gap: 36px;
-  grid-row-gap: 36px;
-`;
 const CharactersFav = (props) => {
-  // console.log(props);
-  const [data, setData] = useState();
-  //   useEffect(() => {
-  //     const fetchData = async () => {
-  //       const response = await axios('http://localhost:5000/api');
-  //       setData({ data: response.data.results });
-  //     };
-  //     fetchData();
-  //   }, []);
-  return data === undefined || data === {} ? (
+  //Axios All could make the whole request fail
+  let favChars = JSON.parse(localStorage.getItem('favChars'));
+  const [chars, setChars] = useState([]);
+  useEffect(() => {
+    const fetchData = () => {
+      let responses = [];
+      favChars.forEach(async (charid) => {
+        const response = await axios(
+          `http://localhost:5000/api/characterid/${charid}`
+        );
+        responses = [...responses, response.data.data.results[0]];
+        setChars([...responses]);
+      });
+    };
+    fetchData();
+  }, []);
+  //You need to send in character .name char.id   .thumbnail.path
+  //for that .data.data.results[0]
+  return chars === undefined || chars === [] ? (
     <Fragment>
       <h1>Waiting for data Im in the favorites</h1>
     </Fragment>
   ) : (
     <Fragment>
       <CharacterContainer>
-        {/* {data.data.map((character) => (
+        {chars.map((character) => (
           <CharactersCard character={character} key={character.id} />
-        ))} */}
+        ))}
       </CharacterContainer>
     </Fragment>
   );

@@ -12,7 +12,6 @@ const CharacterContainer = styled.div`
   grid-row-gap: 36px;
 `;
 const Characters = (props) => {
-  // console.log(props);
   const [data, setData] = useState();
   useEffect(() => {
     const fetchData = async () => {

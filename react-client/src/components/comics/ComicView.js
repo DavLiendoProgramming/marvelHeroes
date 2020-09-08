@@ -29,12 +29,9 @@ const ComicInfo = styled.div`
   }
 `;
 const ComicView = ({ input }) => {
-  console.log(input, 'im trying to be the input');
-  console.log(input.split('/')[5], 'i should be the id');
   const [data, setData] = useState();
   useEffect(() => {
     const fetchData = async () => {
-      console.log('hi input, get hereplease', input);
       const response = await axios({
         method: 'post',
         url: 'http://localhost:5000/api/comic',
@@ -46,7 +43,6 @@ const ComicView = ({ input }) => {
     };
     fetchData();
   }, []);
-  console.log('im the data for the comic', data);
   return input === undefined || input === '' || data === undefined ? (
     <h1>
       Write something in the search bar either an Id or a whole comic issue link

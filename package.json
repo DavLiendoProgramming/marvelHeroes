@@ -8,7 +8,8 @@
     "client": "npm start --prefix react-client",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "build": "run dev",
-    "server": "node server"
+    "server": "nodemon server",
+    "start": "npm run dev"
   },
   "author": "David Liendo",
   "license": "ISC",

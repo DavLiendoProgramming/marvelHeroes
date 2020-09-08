@@ -64,7 +64,6 @@ const Portal = ({ children }) => {
 };
 
 const CharacterModal = ({ children, open, toggle, character }) => {
-  console.log(character);
   const [data, setData] = useState();
   useEffect(() => {
     const fetchData = async () => {
@@ -88,7 +87,7 @@ const CharacterModal = ({ children, open, toggle, character }) => {
             {/* {children} */}
             <ComicMin comics={data} name={character.name} />
           </ModalCard>
-          <Background onClick={() => toggle} />
+          <Background onClick={() => toggle()} />
         </ModalWrapper>
       )}
     </Portal>

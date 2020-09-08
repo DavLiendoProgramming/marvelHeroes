@@ -6,6 +6,7 @@ const Switch = styled.div`
   height: 100%;
   float: left;
   padding-top: 0.9%;
+  margin-left: 10px;
   .tgl {
     display: none;
   }
